@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet" />
+</head>
+
+<body>
+    <div
+        class="min-h-[100vh] px-[100px] p-10 w-full bg-gradient-to-r flex flex-col items-center from-green-400 to-blue-500">
+        <h1 class="mb-5 text-[white] text-4xl font-semibold">Note Taking App</h1>
+        <p class="mb-5 text-[red]">Double click to delete a note.</p>
+        <div class="flex justify-start w-full gap-[5%] flex-wrap" id="note-container">
+            <div class="md:w-[30%] w-full bg-[rgba(255,255,255,0.23)] h-[200px] shadow-xl rounded-lg px-3 text-sm text-white py-4 flex justify-center items-center hover:bg-[white] hover:cursor-pointer"
+                id="add-note">
+                <i class="ri-add-box-line text-5xl text-[gray]"></i>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const noteContainer = document.getElementById('note-container');
+        const addNoteButton = document.getElementById('add-note');
+
+        // Retrieve existing notes from localStorage
+        let notes = JSON.parse(localStorage.getItem('notes')) || [];
+
+        // Function to create a new textarea element
+        function createNoteTextarea(note) {
+            const textarea = document.createElement('textarea');
+            textarea.className =
+                'note md:w-[30%] w-full bg-[rgba(255,255,255,0.23)] h-[200px] shadow hover:shadow-xl transition rounded-lg px-3 text-sm resize-none focus:outline-none text-white py-4';
+            textarea.value = note.value;
+            textarea.placeholder = 'Enter your note...';
+
+            // Add event listener for double-click to delete the note
+            textarea.addEventListener('dblclick', () => {
+                notes = notes.filter((n) => n.id !== note.id); // Remove the note from the array
+                localStorage.setItem('notes', JSON.stringify(notes)); // Update localStorage
+                noteContainer.removeChild(textarea); // Remove the textarea from the DOM
+            });
+
+            // Insert the textarea before the add-note button
+            noteContainer.insertBefore(textarea, addNoteButton);
+        }
+
+        // Load saved notes on page load
+        notes.forEach((note) => createNoteTextarea(note));
+
+        // Add a new note
+        addNoteButton.addEventListener('click', () => {
+            const newNote = {
+                id: Date.now(), // Unique ID
+                value: '',
+            };
+
+            // Save the new note to the array and localStorage
+            notes.push(newNote);
+            localStorage.setItem('notes', JSON.stringify(notes));
+
+            // Create the textarea for the new note
+            createNoteTextarea(newNote);
+        }); 
+    </script>
+
+</body>
+
+</html>
